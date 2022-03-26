@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <title>YoYo网页版</title>
+        <script src="js/brython.js"></script>
+	    <script src="js/brython_stdlib.js"></script>
+        <link rel="shortcut icon" href="yoyo.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="description" content="YoYo网页版,yoyo游戏">
+        <meta name="keywords" content="YoYo网页版,yoyo游戏">
+        <meta name="author" content="萧垣,Skirt_">
+        <style type="text/css">
+            * {margin-left: 5%; margin-right: 5%;}
+			h1, h2, h3 {text-align: center; padding: 3px;}
+            table {
+                text-align: center;
+                margin: auto;
+				margin-bottom: 10px;
+            }
+            td {padding: 10px;}
+            th{padding: 10px;}
+			a {
+				display: block;
+				color: #14171B;
+				margin: 0 auto;
+    			line-height: 40px;
+    			text-align: center;
+				text-decoration: none;
+			}
+			a:link, a:visited { 
+				color:#14171B; 
+				text-decoration:none; 
+			} 
+			a:hover, a:active { 
+				color:#14171B; 
+				text-decoration:none; 
+			}
+			.anniu {
+  				color: #14171B;
+  				font-weight: auto;
+  				font-size: 20px;
+  				background-color: rgba(0, 0, 0, 0.12);
+  				padding: 9px 9px;
+  				border-radius: 10px;
+  				margin-top: 10px;
+				margin-left: 45%;
+				margin-right: 45%;
+			}
+			.anniu:hover {
+				color: #797979;
+				background-color: rgba(250, 248, 241, 0.12);
+				transition: all 350ms;
+			}
+            b {display: block; font-size: medium; padding-top: 2px;}
+        </style>
+    </head>
+    <body bgcolor="#EEEEF5" onload="brython()">
+        <h1 id="game_name">YoYo网页版</h1>
+        <h2>吖游工作室</h2>
+        <h3>-----------------------游戏说明-----------------------</h3>
+        <b>欢迎游玩由"吖游工作室"开发制作的《悠悠》(Web版)</b>
+	    <b>以下为版本信息：游戏版本：1.0.1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作者：萧垣,Skirt_✿</b>
+	    <b>以下为当前版本介绍：在此版本中，玩家可通过输入指令的方式与电脑玩家进行对战（暂不支持游戏难度选择）；</b>
+        <b>输入quit退出游戏<b>
+        <h3>-----------------------游戏规则-----------------------</h3>
+        <table border="1">
+                        <tr> <!-- 表头 -->
+                            <th>技能名称</th>
+                            <th>技能花费</th>
+                            <th>等级</th>
+                            <th>说明</th>
+                            <th>技能指令</th>
+                        </tr>
+                        <tr> <!-- 悠悠 -->
+                            <td>悠悠</td>
+                            <td>-1</td>
+                            <td>0</td>
+                            <td>为自己增加能量</td>
+                            <td>yy</td>
+                        </tr>
+                        <tr> <!-- 空炮 -->
+                            <td>空炮</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>普通攻击(每隔一回合可使用)</td>
+                            <td>kp</td>
+                        </tr>
+                        <tr> <!-- 拐勾 -->
+                            <td>拐勾</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>攻击技能(atk)</td>
+                            <td>gg</td>
+                        </tr>
+                        <tr> <!-- 防拐勾 -->
+                            <td>防拐勾</td>
+                            <td>0</td>
+                            <td>2</td>
+                            <td>防御技能(dfn)</td>
+                            <td>fgg</td>
+                        </tr>
+                        <tr> <!-- 七星 -->
+                            <td>七星</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>atk</td>
+                            <td>qx</td>
+                        </tr>
+                        <tr> <!-- 防七星 -->
+                            <td>防七星</td>
+                            <td>0</td>
+                            <td>3</td>
+                            <td>dfn</td>
+                            <td>fqx</td>
+                        </tr>
+                        <tr> <!-- 反弹 -->
+                            <td>反弹</td>
+                            <td>1</td>
+                            <td>4</td>
+                            <td>atk</td>
+                            <td>ft</td>
+                        </tr>
+                        <tr> <!-- 飞刀 -->
+                            <td>飞刀</td>
+                            <td>3</td>
+                            <td>5</td>
+                            <td>atk</td>
+                            <td>fd</td>
+                        </tr>
+                        <tr> <!-- 防飞刀 -->
+                            <td>防飞刀</td>
+                            <td>0</td>
+                            <td>5</td>
+                            <td>dfn</td>
+                            <td>ffd</td>
+                        </tr>
+                        <tr> <!-- 核弹 -->
+                            <td>核弹</td>
+                            <td>7</td>
+                            <td>6</td>
+                            <td>atk</td>
+                            <td>hd</td>
+                        </tr>
+                        <tr>
+                            <th colspan="5" rowspan="2" align="left">附：1.攻击技能可被相应的防御技能或高等级的攻击技能抵挡<br />
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.空炮可被任何防御技能抵挡</th>
+                        </tr>
+        </table>
+        <script type="text/python" src="fight_bro.bry"></script>
+        </script>
+	</body>
+
+</html>

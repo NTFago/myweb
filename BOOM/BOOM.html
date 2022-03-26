@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>猜数小游戏</title>
+<script type="text/javascript">
+function go()
+{
+var id;
+var show=document.getElementById("show");
+var start=0,end=100,over=false,people,com;
+var bomb=parseInt(Math.random()*99)+1;
+function loop()
+{
+people=parseInt(prompt("请输入"+start+"到"+end+"之间的数：",""));
+if(people>bomb && people>start && people<end)
+{
+show.innerHTML+="<br>你输入了："+people+"，大了</br>";
+end=people;
+}
+else if(people<bomb && people>start && people<end)
+{
+show.innerHTML+="<br>你输入了："+people+"，小了</br>";
+start=people;
+}
+else if(people==bomb)
+{
+show.innerHTML+="<br>你输入了："+people+"，BOOM!!!</br><br>你输了！</br>";
+over=true;
+clearInterval(id);
+}
+else
+show.innerHTML+="<br>你输入了："+people+"，请输入符合标准的数字</br>";
+if(!over)
+{
+show.innerHTML+="<br>等待电脑输入"+start+"到"+end+"之间的数：</br>";
+com=parseInt(Math.random()*(end-start-1))+start+1;
+if(com>bomb)
+{ show.innerHTML+="<br>电脑输入了："+com+"，大了</br>";
+end=com;
+}
+else if(com<bomb)
+{ show.innerHTML+="<br>电脑输入了："+com+"，小了</br>";
+start=com;
+}
+else
+{
+show.innerHTML+="<br>电脑输入了："+com+"，BOOM!!!</br><br>你赢了！</br>";
+over=true;
+clearInterval(id);
+}
+}
+}
+id=setInterval(loop,1);
+}
+</script>
+</head>
+<body onload="go();">
+<div id="show" />
+</body>
+</html>

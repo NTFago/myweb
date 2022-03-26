@@ -1,0 +1,158 @@
+import random
+from browser import document
+from browser.html import P, B, INPUT, BUTTON, H4, A, DIV
+from browser.widgets.dialog import InfoDialog
+from browser.timer import set_timeout
+
+## 判定等级
+judgement_level = {"yy": 0, "kp": 1, "gg": 2, "fgg": 2, "qx": 3, "fqx": 3, "ft": 4, "fd": 5, "ffd": 5, "hd": 6,}
+## 每个招式对应的能量花费
+costs = {"yy": -1, "kp": 0, "gg": 1, "fgg": 0, "qx": 2, "fqx": 0, "ft": 1, "fd": 3, "ffd": 0, "hd": 7,}
+## 所有可行的动作
+atk = ["yy", "kp", "gg", "qx", "fd", "hd", "ft"]
+dfn = ["fgg", "fqx", "ffd"]
+signals = atk + dfn
+# 游戏主体
+## 玩家类
+class Player:
+	def __init__(self, extra_hp=0):
+		self.hp = 1 + extra_hp
+		self.energy = 0
+		self.atk_able = True
+
+	def act(self):
+		signal = document["command"].value
+		signal = signal.lower().strip()
+		if signal == "start":
+			InfoDialog("TIP", "游戏已开始，请输入指令！")
+		elif signal in signals:
+			self.signal = signal
+			print("player is ok")
+			return self.signal
+		elif signal == "quit":
+			document <= P("正在退出游戏……")
+			quit()
+		else:
+			InfoDialog("WARNING", "无法识别的指令，请重新输入！")
+
+	def change_state(self):
+		if self.signal == "kp" or (not self.atk_able):
+			self.atk_able = not self.atk_able
+
+class Computer(Player):
+	def act(self, bout):
+		if bout == 1:
+			self.signal = random.choice(['kp', 'fgg'])
+		elif self.energy != 7:
+			allowed = self.analyse()
+			print(allowed)
+			if player.signal in atk and player.signal not in ["yy", "ft"]:
+				if player.signal == "kp":
+					allowed.append("fgg")
+				else:
+					allowed.append("f"+player.signal)
+			self.signal = random.choice(allowed)
+		else:
+			self.signal = "hd"
+		return self.signal
+	
+	def analyse(self):
+		allowed = []
+		for key, value in costs.items():
+			# print(key, value)
+			if value <= self.energy and key in atk:
+				print(key)
+				allowed.append(key)
+		if not self.atk_able:
+			allowed.remove("kp")
+		return allowed
+
+class Game:
+	def __init__(self):
+		self.bout = 1
+		self.p1 = player
+		self.p2 = computer
+	
+	def update(self):
+		p1_signal = self.p1.act()   # 保证封装，不随便访问别的对象的属性
+		p2_signal = self.p2.act(self.bout)
+		p1_level = judgement_level[p1_signal]
+		p2_level = judgement_level[p2_signal]
+		self.p1.energy -= costs[p1_signal]
+		self.p2.energy -= costs[p2_signal]
+
+		if self.p1.energy < 0:
+			result, tip = 1, "当前能量不足，游戏结束！"
+		elif self.p2.energy < 0:
+			result, tip = 1, "敌方玩家能量不足，游戏失败！"
+		elif p1_signal in atk and p2_signal in atk:    # 双方都是攻(或悠悠)
+			if p1_level == 1 and not self.p1.atk_able:   # 是空炮，但不能空炮
+				result, tip = 1, "当前状态下你无法使用空炮，游戏失败！"
+			elif ((not p1_level) and p2_level == 4) or (p1_level == 4 and(not p2_level)):  # 我悠他反弹或他反弹我悠
+				result, tip = 0, "游戏继续~"
+			elif p2_level == 1 and not self.p2.atk_able:
+				result, tip = 1, "电脑玩家错误地使用了空炮，游戏成功！"
+			elif p1_level > p2_level:
+				result, tip = 1, "游戏成功!"
+			elif p1_level == p2_level:
+				result, tip = 0, "游戏继续~"
+			else:
+				result, tip = 1, "游戏失败！"
+		elif p1_signal in atk and p2_signal in dfn:   # 我攻(或悠)他防
+			if not p1_level or p1_level == 1 or p1_level == p2_level or p1_level == 4:   # 我悠或空炮或防住
+				result, tip = 0, "游戏继续~"
+			elif p2_level != p1_level:  # 它没防住
+				result, tip = 1, "游戏成功!"
+		elif p2_signal in atk and p1_signal in dfn:   # 他攻(或悠)我防
+			if (not p2_level) or p2_level == 1 or p1_level == p2_level or p2_level == 4:
+				result, tip = 0, "游戏继续~"
+			elif p2_level != p1_level:  # 我没防住
+				result, tip = 1, "游戏失败!"
+		elif len(p1_signal) == 3 and len(p2_signal) == 3:
+			result, tip = 0, "游戏继续~"
+
+		self.p1.change_state()
+		self.p2.change_state()
+		self.bout += 1
+		return result, tip
+
+def upload_page(evt):
+	del document["game"]
+	game_info = DIV(id="game_info")
+	game_info <= H4("游戏已开始，请输入本回合执行的指令：")
+	game_info <= P(f"当前状态(第{game.bout}回合)", id="state")
+	game_info <= P(f"电脑玩家：Hp = {computer.hp}    能量 = {computer.energy}", id="com")
+	game_info <= P(f"人类玩家：Hp = {player.hp}    能量 = {player.energy}", id="pl")
+	game_info <= INPUT(id="command")
+	game_info <= BUTTON("确定", id="submit")
+	document <= game_info
+	document["submit"].bind("click", submit)
+
+def submit(evt):
+	print("submit is OK")
+	result, tip = game.update()
+	try:
+		document["myAct"].textContent = game.p1.signal
+		document["comAct"].textContent = game.p2.signal
+		document["tip"].textContent = tip
+	except KeyError:
+		document <= P(f"本回合(第{game.bout-1}回合)你出了：") + B(game.p1.signal, id="myAct")
+		document <= P("电脑玩家出了：") + B(game.p2.signal, id="comAct")
+		document <= B(tip, id="tip")
+	except Exception as error:
+		print(error)
+		document <= P("未知的错误，请联系管理员修复")
+
+	if result:
+		del document["game_info"]
+		document <= A("重新开始~", Class="anniu", href="game.html")
+	else:
+		document["state"].textContent = f"当前状态(第{game.bout}回合)"
+		document["com"].textContent = f"电脑玩家：Hp = {computer.hp}    能量 = {computer.energy}"
+		document["pl"].textContent = f"人类玩家：Hp = {player.hp}    能量 = {player.energy}"
+
+player = Player()
+computer = Computer()
+game = Game()
+document <= A("开始游戏", Class="anniu", id="game")
+document["game"].bind("click", upload_page)
